@@ -2,6 +2,8 @@ const router = require("express").Router();
 
 const posts = require("../data/db.js");
 
+//esm dependency that allows "imports" es6 style
+
 //POST /api/posts
 router.post("/", (req, res) => {
   const { title, contents } = req.body;
@@ -58,8 +60,11 @@ router.get("/:id", (req, res) => {
   //findById(id)
   posts
     .findById(postId)
+    .first()
+    // this would take it out of array so it can
     .then(post => {
-      if (postId > post) {
+      //   if (postId > post) {
+      if (!post) {
         return (
           res
             //status(404)
@@ -84,7 +89,26 @@ router.get("/:id", (req, res) => {
 //status(500)
 
 //DELETE /api/posts/:id
-// remove(id)
+router.delete("/:id", (req, res) => {
+  const postId = req.params.id;
+  // remove(id)
+  posts
+    .remove(postId)
+    .then(post => {
+      if (!post) {
+        res
+          .status(404)
+          .json({ message: "The post with the specified ID does not exist." });
+      } else {
+        res
+          .status(200)
+          .json({ message: "The post with the specified ID does not exist." });
+      }
+    })
+    .catch(err => {
+      res.catch(500).json({ error: "The post could not be removed" });
+    });
+});
 //status(404)
 //status(500)
 
