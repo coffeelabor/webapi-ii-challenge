@@ -60,8 +60,8 @@ router.get("/:id", (req, res) => {
   //findById(id)
   posts
     .findById(postId)
-    .first()
     // this would take it out of array so it can
+    .first()
     .then(post => {
       //   if (postId > post) {
       if (!post) {
@@ -97,6 +97,7 @@ router.delete("/:id", (req, res) => {
     .then(post => {
       if (!post) {
         res
+          //status(404)
           .status(404)
           .json({ message: "The post with the specified ID does not exist." });
       } else {
@@ -104,18 +105,45 @@ router.delete("/:id", (req, res) => {
       }
     })
     .catch(err => {
+      //status(500)
       res.catch(500).json({ error: "The post could not be removed" });
     });
 });
-//status(404)
-//status(500)
 
 //PUT /api/posts/:id
-// update(id, post)
-//status(404)
-//status(400)
-//status(500)
-//status(200)
+router.put("/:id", (req, res) => {
+  const postId = req.params.id;
+  const { title, contents } = req.body;
+
+  // update(id, post)
+  posts
+    .update(postId, { title, contents })
+    .then(updated => {
+      if (!updated) {
+        //status(404)
+        res.status(404).json({
+          message: "The post with the specified ID does not exist.",
+          updated
+        });
+      } else {
+        if (!title || !contents) {
+          //status(400)
+          res.status(400).json({
+            errorMessage: "Please provide title and contents for the post."
+          });
+        } else {
+          //status(200)
+          res.status(200).json({ message: "OK" });
+        }
+      }
+    })
+    .catch(err => {
+      res
+        //status(500)
+        .status(500)
+        .json({ error: "The post information could not be modified." });
+    });
+});
 
 // router.get("/:id", (req, res) => {
 //   db.get({})
