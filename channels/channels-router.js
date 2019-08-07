@@ -30,12 +30,47 @@ router.post("/", (req, res) => {
 });
 
 //POST /api/posts/:id/comments
-// insertComment(comment)
-//status(404)
+router.post("/:id/comments", (req, res) => {
+  const postId = req.params.id;
+  const { text, post_id } = req.body;
+  posts
+    .findById(postId)
+    // this would take it out of array so it can
+    .first()
+    .then(post => {
+      //   if (postId > post) {
+      if (!post) {
+        return (
+          res
+            //status(404)
+            .status(404)
+            .json({ message: "The post with the specified ID does not exist." })
+        );
+      } else {
+        if (!text) {
+          //status(400)
+          res
+            .status(400)
+            .json({ errorMessage: "Please provide text for the comment." });
+        } else {
+          // insertComment(comment)
+          posts.insertComment(req.body);
+          return then(comment => {
+            //status(201)
+            res.status(201).json(comment);
+          });
+        }
+      }
+    })
+    .catch(err => {
+      res
+        //status(500)
+        .status(500)
+        .json({ error: "The post information could not be retrieved." });
+    });
+});
+
 //status(400)
-//status(400)
-//status(201)
-//status(500)
 
 //GET /api/posts
 router.get("/", (req, res) => {
@@ -92,21 +127,23 @@ router.get("/:id/comments", (req, res) => {
     // .first()
     .then(post => {
       if (postId > post) {
-        return res
-          .status(404)
-          .json({ message: "The post with the specified ID does not exist." });
+        return (
+          res
+            //status(404)
+            .status(404)
+            .json({ message: "The post with the specified ID does not exist." })
+        );
       } else {
         res.status(200).json(post);
       }
     })
     .catch(err => {
       res
+        //status(500)
         .status(500)
         .json({ error: "The comments information could not be retrieved." });
     });
 });
-//status(404)
-//status(500)
 
 //DELETE /api/posts/:id
 router.delete("/:id", (req, res) => {
